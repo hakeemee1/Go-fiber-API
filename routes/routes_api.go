@@ -15,10 +15,14 @@ func ApiRoutes(app *fiber.App) {
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
+	v3 := api.Group("/v3")
 	fact := v1.Group("/fact")
+	myName := v3.Group("/kimi")
 
 	v1.Get("/", controllers.HelloTest)
 
 	fact.Get("/:num", controllers.FactCalc)
+
+	myName.Get("/", controllers.AsciiCalc)
 	
 }
