@@ -24,5 +24,8 @@ func ApiRoutes(app *fiber.App) {
 	fact.Get("/:num", c.FactCalc)
 
 	myName.Get("/", c.AsciiCalc)
+	v1.Post("/register", c.Register)
+
+
 	
 }
