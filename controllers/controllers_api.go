@@ -1,11 +1,10 @@
 package controllers
 
 import (
+	m "go-fiber-test/models"
 	"regexp"
 	"strconv"
-	
-
-	models "go-fiber-test/models"
+	"strings"
 
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
@@ -65,67 +64,48 @@ func AsciiCalc(c *fiber.Ctx) error {
 	})
 }
 
-// CustomValidator เป็นฟังก์ชันสำหรับ validate ชื่อเว็บไซต์
-func WebsiteDomainValidator(fl validator.FieldLevel) bool {
-	website := fl.Field().String()
-	regex := regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9-]{0,28}[a-zA-Z0-9]$`)
-	return regex.MatchString(website)
-}
-
-var validate = validator.New()
-
-func init() {
-	validate.RegisterValidation("websiteDomain", WebsiteDomainValidator)
-}
-
 func Register(c *fiber.Ctx) error {
-	var user models.Register
 
-	if err := c.BodyParser(&user); err != nil {
+	user := new(m.Register)
+	if err := c.BodyParser((user)); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Cannot parse JSON",
+			"message": err.Error(),
 		})
+
 	}
 
-	if err := validate.Struct(user); err != nil {
-		errors := err.(validator.ValidationErrors)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"errors": formatValidationErrors(errors),
-		})
-	}
-
-	// TODO: ดำเนินการลงทะเบียนผู้ใช้ในฐานข้อมูล
-
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "User registered successfully",
+	validate := validator.New()
+	validate.RegisterValidation("username_validate", func(fl validator.FieldLevel) bool {
+		return regexp.MustCompile(`^[a-zA-Z0-9_-]+$`).MatchString(fl.Field().String())
 	})
-}
+	validate.RegisterValidation("web_validate", func(fl validator.FieldLevel) bool {
+		return regexp.MustCompile(`^[a-z0-9\.]+$`).MatchString(fl.Field().String())
+	})
+	err := validate.Struct(user)
+	if err != nil {
+		fieldErrors := make(map[string]string)
 
-func formatValidationErrors(errors validator.ValidationErrors) map[string]string {
-	errorMap := make(map[string]string)
-
-	for _, err := range errors {
-		switch err.Tag() {
-		case "required":
-			errorMap[err.Field()] = "กรุณากรอกข้อมูลในช่องนี้"
-		case "email":
-			errorMap[err.Field()] = "กรุณากรอกอีเมลให้ถูกต้อง"
-		case "alphanum":
-			errorMap[err.Field()] = "กรุณาใช้ตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น"
-		case "min":
-			errorMap[err.Field()] = "ข้อมูลต้องมีความยาวอย่างน้อย " + err.Param() + " ตัวอักษร"
-		case "max":
-			errorMap[err.Field()] = "ข้อมูลต้องมีความยาวไม่เกิน " + err.Param() + " ตัวอักษร"
-		case "numeric":
-			errorMap[err.Field()] = "กรุณากรอกตัวเลขเท่านั้น"
-		case "len":
-			errorMap[err.Field()] = "ข้อมูลต้องมีความยาว " + err.Param() + " ตัวอักษร"
-		case "websiteDomain":
-			errorMap[err.Field()] = "ชื่อเว็บไซต์ไม่ถูกต้อง"
-		default:
-			errorMap[err.Field()] = "ข้อมูลไม่ถูกต้อง"
+		for _, e := range err.(validator.ValidationErrors) {
+			if e.Field() == "Email" && e.Tag() == "email" {
+				fieldErrors[strings.ToLower(e.Field())] = "Invalid email"
+			} else if e.Field() == "Username" && e.Tag() == "username_validate" {
+				fieldErrors[strings.ToLower(e.Field())] = "ใช้อักษรภาษาอังกฤษ (a-z), (A-Z), ตัวเลข (0-9) และเครื่องหมาย (_), (-) เท่านั้น เช่น Example_01"
+			} else if e.Field() == "Password" && (e.Tag() == "min" || e.Tag() == "max") {
+				fieldErrors[strings.ToLower(e.Field())] = "ความยาว 6-20 อักษร"
+			} else if e.Field() == "WebName" && (e.Tag() == "min" || e.Tag() == "max") {
+				fieldErrors[strings.ToLower(e.Field())] = "ความยาว 2-30 อักษร"
+			} else if e.Field() == "WebName" && (e.Tag() == "web_validate") {
+				fieldErrors[strings.ToLower(e.Field())] = "ใช้อักษรภาษาอังกฤษตัวเล็ก (a-z), ตัวเลข (0-9) ห้ามใช้เครื่องหมายอักขระพิเศษยกเว้นขีด (-) ห้ามเว้นวรรค และห้ามใช้ภาษาไทย"
+			} else {
+				fieldErrors[strings.ToLower(e.Field())] = e.Field() + " is required"
+			}
 		}
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Validation errors occurred",
+			"errors":  fieldErrors,
+		})
 	}
 
-	return errorMap
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"result": user})
 }
