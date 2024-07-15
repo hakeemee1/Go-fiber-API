@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"go-fiber-test/controllers"
+	c "go-fiber-test/controllers"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
@@ -19,10 +19,10 @@ func ApiRoutes(app *fiber.App) {
 	fact := v1.Group("/fact")
 	myName := v3.Group("/kimi")
 
-	v1.Get("/", controllers.HelloTest)
+	v1.Get("/", c.HelloTest)
 
-	fact.Get("/:num", controllers.FactCalc)
+	fact.Get("/:num", c.FactCalc)
 
-	myName.Get("/", controllers.AsciiCalc)
+	myName.Get("/", c.AsciiCalc)
 	
 }
