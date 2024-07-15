@@ -13,9 +13,12 @@ func ApiRoutes(app *fiber.App) {
 			"gofiber": "21022566"},
 	}))
 
+	api := app.Group("/api")
+	v1 := api.Group("/v1")
+	fact := v1.Group("/fact")
 
-	app.Get("/", controllers.HelloTest)
-	//group api
-	// api := app.Group("/api/v1")
-	// fact := api.Group("/fact")
+	v1.Get("/", controllers.HelloTest)
+
+	fact.Get("/:num", controllers.FactCalc)
+	
 }
