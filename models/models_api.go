@@ -42,3 +42,15 @@ type ResultData struct {
 	Sum_pink    int       `json:"sum_pink"`
 	Sum_noColor int       `json:"sum_nocolor"`
 }
+
+//User Profile
+type UserProfiles struct {
+	gorm.Model
+	EmployeeID string `gorm:"unique" json:"employee_id"`
+	Name       string `json:"name" validate:"required"`
+	LastName   string `json:"lastname" validate:"required"`
+	Birthday   string `json:"birthday" validate:"required"`
+	Age        int    `json:"age" validate:"required,min=18"`
+	Email      string `json:"email" validate:"required,email"`
+	Tel        string `json:"tel" validate:"required"`
+}
