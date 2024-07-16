@@ -1,5 +1,6 @@
 package models
 
+import "gorm.io/gorm"
 
 type Register struct {
 	Email    string `json:"email" validate:"required,email"`
@@ -9,4 +10,10 @@ type Register struct {
 	Phone    string `json:"phone" validate:"required,numeric,len=10"`
 	Business string `json:"business" validate:"required"`
 	WebName  string `json:"webName" validate:"required,min=2,max=30,web_validate"`
+}
+
+type Dogs struct {
+	gorm.Model
+	Name  string `json:"name"`
+	DogID int    `json:"dog_id"`
 }
