@@ -225,6 +225,13 @@ func GetDeletedDogs(c *fiber.Ctx) error {
 	return c.Status(200).JSON(dogs)
 }
 
+func GetDogsIdMoreThan(c *fiber.Ctx) error {
+	db := database.DBConn
+	var dogs []m.Dogs
+	db.Where("dog_id > 50 AND dog_id < 100").Find(&dogs)
+	return c.Status(200).JSON(dogs)
+}
+
 //Companies CRUD
 func GetCompanies(c *fiber.Ctx) error {
 	db := database.DBConn

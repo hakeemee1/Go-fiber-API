@@ -30,6 +30,7 @@ func ApiRoutes(app *fiber.App) {
 	dog := v1.Group("/dog")
 	dog.Get("", c.GetDogs)
 	dog.Get("/filter", c.GetDog)
+	dog.Get("/idmorethan", c.GetDogsIdMoreThan)
 	dog.Get("/json", c.GetDogsJson)
 	dog.Post("/", c.AddDog)
 	dog.Put("/:id", c.UpdateDog)
