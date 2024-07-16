@@ -319,3 +319,43 @@ func RemoveCompany(c *fiber.Ctx) error {
 	}
 	return c.SendStatus(200)
 }
+
+//CRUD Userprofile
+func GetUserProfiles(c *fiber.Ctx) error {
+	db := database.DBConn	
+	var users []m.UserProfiles
+	db.Find(&users)
+	return c.Status(200).JSON(users)
+}
+
+func AddUserProfile(c *fiber.Ctx) error {
+	db := database.DBConn
+	var user m.UserProfiles
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	db.Create(&user)
+	return c.Status(201).JSON(user)
+}
+
+func UpdateUserProfile(c *fiber.Ctx) error {
+	db := database.DBConn
+	var user m.UserProfiles
+	id := c.Params("id")
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	db.Where("id = ?", id).Updates(&user)
+	return c.Status(200).JSON(user)
+}
+
+func RemoveUserProfile(c *fiber.Ctx) error {
+	db := database.DBConn
+	id := c.Params("id")
+	var user m.UserProfiles
+	result := db.Delete(&user, id)
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
+	}
+	return c.SendStatus(200)
+}

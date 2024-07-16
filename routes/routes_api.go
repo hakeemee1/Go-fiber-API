@@ -45,4 +45,11 @@ func ApiRoutes(app *fiber.App) {
 	company.Put("/:id", c.UpdateCompany)
 	company.Delete("/:id", c.RemoveCompany)
 
+	//CRUD UserProfile
+	profile := v1.Group("/profile")
+	profile.Get("", c.GetUserProfiles)
+	profile.Post("/", c.AddUserProfile)
+	profile.Put("/:id", c.UpdateUserProfile)
+	profile.Delete("/:id", c.RemoveUserProfile)
+
 }
