@@ -26,6 +26,13 @@ func ApiRoutes(app *fiber.App) {
 	myName.Get("/", c.AsciiCalc)
 	v1.Post("/register", c.Register)
 
+	//CRUD dogs
+	dog := v1.Group("/dog")
+	dog.Get("", c.GetDogs)
+	dog.Get("/filter", c.GetDog)
+	dog.Get("/json", c.GetDogsJson)
+	dog.Post("/", c.AddDog)
+	dog.Put("/:id", c.UpdateDog)
+	dog.Delete("/:id", c.RemoveDog)
 
-	
 }
