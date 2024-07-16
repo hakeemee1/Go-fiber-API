@@ -232,6 +232,54 @@ func GetDogsIdMoreThan(c *fiber.Ctx) error {
 	return c.Status(200).JSON(dogs)
 }
 
+func GetDogsJsonSummary(c *fiber.Ctx) error {
+	db := database.DBConn
+	var dogs []m.Dogs
+
+	db.Find(&dogs)
+
+	sumRed := 0
+	sumGreen := 0
+	sumPink := 0
+	sumNone := 0
+
+	var dataResults []m.DogsRes
+	for _, v := range dogs {
+		typeStr := ""
+		if v.DogID >= 10 && v.DogID <= 50 {
+			typeStr = "red"
+			sumRed++
+		} else if v.DogID >= 100 && v.DogID <= 150 {
+			typeStr = "green"
+			sumGreen++
+		} else if v.DogID >= 200 && v.DogID <= 250 {
+			typeStr = "pink"
+			sumPink++
+		} else {
+			typeStr = "no color"
+			sumNone++
+		}
+
+		d := m.DogsRes{
+			Name:  v.Name,
+			DogID: v.DogID,
+			Type:  typeStr,
+		}
+		dataResults = append(dataResults, d)
+	}
+
+	r := m.ResultData{
+		Data:        dataResults,
+		Name:        "golang-test",
+		// Count:       len(dogs),
+		Sum_red:     sumRed,
+		Sum_green:   sumGreen,
+		Sum_pink:    sumPink,
+		Sum_noColor: sumNone,
+	}
+	return c.Status(200).JSON(r)
+}
+
 //Companies CRUD
 func GetCompanies(c *fiber.Ctx) error {
 	db := database.DBConn
