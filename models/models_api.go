@@ -17,3 +17,9 @@ type Dogs struct {
 	Name  string `json:"name"`
 	DogID int    `json:"dog_id"`
 }
+
+type DogsRes struct {
+	Name  string `json:"name"`
+	DogID int    `json:"dog_id"`
+	Type  string `json:"type"`
+}

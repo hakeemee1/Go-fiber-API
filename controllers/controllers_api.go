@@ -1,6 +1,7 @@
 package controllers
 
 import (
+
 	"go-fiber-test/database"
 	m "go-fiber-test/models"
 	"regexp"
@@ -179,13 +180,9 @@ func GetDogsJson(c *fiber.Ctx) error {
 
 	db.Find(&dogs) //10ตัว
 
-	type DogsRes struct {
-		Name  string `json:"name"`
-		DogID int    `json:"dog_id"`
-		Type  string `json:"type"`
-	}
+	
 
-	var dataResults []DogsRes
+	var dataResults []m.DogsRes
 	for _, v := range dogs { //1 inet 112 //2 inet1 113
 		typeStr := ""
 		if v.DogID == 111 {
@@ -198,7 +195,7 @@ func GetDogsJson(c *fiber.Ctx) error {
 			typeStr = "no color"
 		}
 
-		d := DogsRes{
+		d := m.DogsRes{
 			Name:  v.Name,  //inet
 			DogID: v.DogID, //112
 			Type:  typeStr, //no color
@@ -208,7 +205,7 @@ func GetDogsJson(c *fiber.Ctx) error {
 	}
 
 	type ResultData struct {
-		Data  []DogsRes `json:"data"`
+		Data  []m.DogsRes `json:"data"`
 		Name  string    `json:"name"`
 		Count int       `json:"count"`
 	}
