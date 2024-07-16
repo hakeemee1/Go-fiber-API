@@ -34,16 +34,16 @@ type Companies struct {
 }
 
 type ResultData struct {
-	Data        []DogsRes `json:"data"`
-	Name        string    `json:"name"`
+	Data []DogsRes `json:"data"`
+	Name string    `json:"name"`
 	// Count       int       `json:"count"`
-	Sum_red     int       `json:"sum_red"`
-	Sum_green   int       `json:"sum_green"`
-	Sum_pink    int       `json:"sum_pink"`
-	Sum_noColor int       `json:"sum_nocolor"`
+	Sum_red     int `json:"sum_red"`
+	Sum_green   int `json:"sum_green"`
+	Sum_pink    int `json:"sum_pink"`
+	Sum_noColor int `json:"sum_nocolor"`
 }
 
-//User Profile
+// User Profile
 type UserProfiles struct {
 	gorm.Model
 	EmployeeID string `gorm:"unique" json:"employee_id"`
@@ -53,4 +53,16 @@ type UserProfiles struct {
 	Age        int    `json:"age" validate:"required,min=18"`
 	Email      string `json:"email" validate:"required,email"`
 	Tel        string `json:"tel" validate:"required"`
+	Gen        string `json:"gen" validate:"required"`
+}
+
+type UserProfileAgesResult struct {
+	Data          []UserProfiles `json:"data"`
+	Name          string         `json:"name"`
+	Count         int            `json:"count"`
+	SumGenZ       int            `json:"sum_genz"`
+	SumGenY       int            `json:"sum_geny"`
+	SumGenX       int            `json:"sum_genx"`
+	SumBabyBoomer int            `json:"sum_babyboomer"`
+	SumGI         int            `json:"sum_gi"`
 }

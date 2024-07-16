@@ -13,6 +13,7 @@ func ApiRoutes(app *fiber.App) {
 	v1 := api.Group("/v1")
 	profile := v1.Group("/profile")
 	profile.Get("", c.GetUserProfiles)
+	profile.Get("/ages", c.GetProfileAnyAges)
 	app.Use(basicauth.New(basicauth.Config{
 		Users: map[string]string{
 			"testgo": "23012023"},

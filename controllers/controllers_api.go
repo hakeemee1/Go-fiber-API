@@ -1,7 +1,6 @@
 package controllers
 
 import (
-
 	"go-fiber-test/database"
 	m "go-fiber-test/models"
 	"regexp"
@@ -180,8 +179,6 @@ func GetDogsJson(c *fiber.Ctx) error {
 
 	db.Find(&dogs) //10ตัว
 
-	
-
 	var dataResults []m.DogsRes
 	for _, v := range dogs { //1 inet 112 //2 inet1 113
 		typeStr := ""
@@ -206,8 +203,8 @@ func GetDogsJson(c *fiber.Ctx) error {
 
 	type ResultData struct {
 		Data  []m.DogsRes `json:"data"`
-		Name  string    `json:"name"`
-		Count int       `json:"count"`
+		Name  string      `json:"name"`
+		Count int         `json:"count"`
 	}
 	r := ResultData{
 		Data:  dataResults,
@@ -269,8 +266,8 @@ func GetDogsJsonSummary(c *fiber.Ctx) error {
 	}
 
 	r := m.ResultData{
-		Data:        dataResults,
-		Name:        "golang-test",
+		Data: dataResults,
+		Name: "golang-test",
 		// Count:       len(dogs),
 		Sum_red:     sumRed,
 		Sum_green:   sumGreen,
@@ -280,7 +277,7 @@ func GetDogsJsonSummary(c *fiber.Ctx) error {
 	return c.Status(200).JSON(r)
 }
 
-//Companies CRUD
+// Companies CRUD
 func GetCompanies(c *fiber.Ctx) error {
 	db := database.DBConn
 	var companies []m.Companies
@@ -320,9 +317,9 @@ func RemoveCompany(c *fiber.Ctx) error {
 	return c.SendStatus(200)
 }
 
-//CRUD Userprofile
+// CRUD Userprofile
 func GetUserProfiles(c *fiber.Ctx) error {
-	db := database.DBConn	
+	db := database.DBConn
 	var users []m.UserProfiles
 	db.Find(&users)
 	return c.Status(200).JSON(users)
@@ -358,4 +355,68 @@ func RemoveUserProfile(c *fiber.Ctx) error {
 		return c.SendStatus(404)
 	}
 	return c.SendStatus(200)
+}
+func GetProfileAnyAges(c *fiber.Ctx) error {
+	var profiles []m.UserProfiles
+	db := database.DBConn
+
+	sumGenZ := 0
+	sumGenY := 0
+	sumGenX := 0
+	sumBabyBoomer := 0
+	sumGI := 0
+
+	db.Find(&profiles)
+	var dataResult []m.UserProfiles
+	_ = dataResult
+	for _, value := range profiles {
+
+		genStr := ""
+
+		if value.Age > 75 {
+			genStr = "G.I Generation"
+			sumGI++
+		} else if value.Age >= 24 && value.Age <= 41 {
+			genStr = "Gen Y"
+			sumGenY++
+
+		} else if value.Age >= 42 && value.Age <= 56 {
+			genStr = "Gen X"
+			sumGenX++
+		} else if value.Age >= 57 && value.Age <= 75 {
+			genStr = "Baby Boomer"
+			sumBabyBoomer++
+		} else {
+			genStr = "Gen Z"
+			sumGenZ++
+		}
+
+		p := m.UserProfiles{
+			EmployeeID: value.EmployeeID,
+			Name:       value.Name,
+			LastName:   value.LastName,
+			Birthday:   value.Birthday,
+			Age:        value.Age,
+			Email:      value.Email,
+			Tel:        value.Tel,
+			Gen:        genStr,
+		}
+
+		dataResult = append(dataResult, p)
+
+	}
+
+	r := m.UserProfileAgesResult{
+		Data:          dataResult,
+		Name:          "profile-ages",
+		Count:         len(profiles),
+		SumGenZ:       sumGenZ,
+		SumGenY:       sumGenY,
+		SumGenX:       sumGenX,
+		SumBabyBoomer: sumBabyBoomer,
+		SumGI:         sumGI,
+	}
+
+	return c.Status(200).JSON(r)
+
 }
