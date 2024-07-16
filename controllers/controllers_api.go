@@ -216,3 +216,51 @@ func GetDogsJson(c *fiber.Ctx) error {
 	}
 	return c.Status(200).JSON(r)
 }
+
+func GetDeletedDogs(c *fiber.Ctx) error {
+	db := database.DBConn
+	var dogs []m.Dogs
+
+	db.Unscoped().Where("deleted_at is NOT NULL").Find(&dogs)
+	return c.Status(200).JSON(dogs)
+}
+
+//Companies CRUD
+func GetCompanies(c *fiber.Ctx) error {
+	db := database.DBConn
+	var companies []m.Companies
+	db.Find(&companies)
+	return c.Status(200).JSON(companies)
+}
+
+func AddCompany(c *fiber.Ctx) error {
+	db := database.DBConn
+	var company m.Companies
+	if err := c.BodyParser(&company); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	db.Create(&company)
+	return c.Status(201).JSON(company)
+}
+
+func UpdateCompany(c *fiber.Ctx) error {
+	db := database.DBConn
+	var company m.Companies
+	id := c.Params("id")
+	if err := c.BodyParser(&company); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	db.Where("id = ?", id).Updates(&company)
+	return c.Status(200).JSON(company)
+}
+
+func RemoveCompany(c *fiber.Ctx) error {
+	db := database.DBConn
+	id := c.Params("id")
+	var company m.Companies
+	result := db.Delete(&company, id)
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
+	}
+	return c.SendStatus(200)
+}
