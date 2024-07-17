@@ -420,3 +420,16 @@ func GetProfileAnyAges(c *fiber.Ctx) error {
 	return c.Status(200).JSON(r)
 
 }
+
+func SearchProfiles(c *fiber.Ctx) error {
+
+	db := database.DBConn
+	var profiles []m.UserProfiles
+
+	search := c.Query("search")
+
+	db.Where("(employee_id = ? || name = ? || last_name = ? ) && deleted_at is NULL", search, search, search).Find(&profiles)
+
+	return c.JSON(profiles)
+
+}
